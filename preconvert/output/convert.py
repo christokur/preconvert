@@ -46,8 +46,13 @@ def default_serializer(
         preconverters = chain(*(store[base_namespace].items() for package_store in package_stores))
 
     for kind, transformer in reversed(tuple(preconverters)):
-        if isinstance(item, kind):
-            return transformer(item)
+        try:
+            if isinstance(item, kind):
+                return transformer(item)
+        except TypeError:
+            pass
+        except Exception as exc:
+            raise exc
 
     if hasattr(item, "__iter__"):
         return list(item)
